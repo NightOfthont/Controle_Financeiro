@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#163d32" />
+    <meta
+      name="description"
+      content="Organize suas receitas e despesas com o Clareza, seu controle financeiro pessoal."
+    />
+    <title>Clareza — Controle financeiro</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="finance.js" defer></script>
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Pular para o conteúdo</a>
+    <aside class="sidebar">
+      <a class="brand" href="#visao-geral" aria-label="Clareza, início"
+        ><span class="brand-symbol">c<span>·</span></span
+        >clareza<span class="brand-dot">.</span></a
+      >
+      <div class="workspace">
+        <span class="workspace-icon" data-icon="wallet"></span>
+        <div>Minhas finanças<small>Espaço pessoal</small></div>
+        <span class="workspace-check">✓</span>
+      </div>
+      <p class="nav-label">PRINCIPAL</p>
+      <nav aria-label="Navegação principal">
+        <a href="#visao-geral" class="nav-item active" data-view="overview"
+          ><span data-icon="grid"></span>Visão geral</a
+        >
+        <a href="#lancamentos" class="nav-item" data-view="transactions"
+          ><span data-icon="arrows"></span>Lançamentos<span
+            class="nav-count"
+            id="nav-count"
+            >0</span
+          ></a
+        >
+        <a href="#relatorios" class="nav-item" data-view="reports"
+          ><span data-icon="chart"></span>Relatórios</a
+        >
+      </nav>
+      <div class="sidebar-tip">
+        <span data-icon="sparkles"></span>
+        <h3>Pequenos hábitos.<br />Grandes conquistas.</h3>
+        <p>Entender seu dinheiro é o primeiro passo para ir mais longe.</p>
+        <span class="tip-line"></span>
+      </div>
+      <div class="sidebar-bottom">
+        <a href="#como-usar" class="nav-item" data-view="help"
+          ><span data-icon="help"></span>Como usar</a
+        >
+        <div class="local-note">
+          <span class="local-dot"></span>Seus dados ficam neste navegador
+        </div>
+        <div class="profile">
+          <span class="avatar">EU</span>
+          <div>Meu espaço<small>Controle pessoal</small></div>
+          <span data-icon="lock"></span>
+        </div>
+      </div>
+    </aside>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="breadcrumb">
+          Meu espaço <span>/</span>
+          <strong id="breadcrumb-label">Visão geral</strong>
+        </div>
+        <div class="topbar-right">
+          <a
+            href="#como-usar"
+            class="icon-button mobile-help"
+            aria-label="Como usar"
+            ><span data-icon="help"></span></a
+          ><span class="today" id="today"></span
+          ><button
+            class="icon-button"
+            id="privacy-toggle"
+            aria-label="Ocultar valores"
+            aria-pressed="false"
+            title="Ocultar valores"
+          >
+            <span data-icon="eye"></span></button
+          ><span class="top-avatar">EU</span>
+        </div>
+      </header>
+      <main id="main" tabindex="-1">
+        <section class="page-heading">
+          <div>
+            <p class="eyebrow">SEU DINHEIRO, COM MAIS CLAREZA</p>
+            <h1 id="page-title">Visão geral</h1>
+            <p id="page-subtitle">
+              Um olhar sobre suas finanças. Mais controle para suas escolhas.
+            </p>
+          </div>
+          <button class="button primary" id="new-transaction">
+            <span data-icon="plus"></span>Novo lançamento
+          </button>
+        </section>
+        <section class="toolbar" aria-label="Período e exportação">
+          <div class="period-control">
+            <button
+              class="icon-button"
+              id="previous-month"
+              aria-label="Mês anterior"
+            >
+              <span data-icon="chevron-left"></span></button
+            ><label class="month-label"
+              ><span data-icon="calendar"></span><span id="month-label"></span
+              ><input
+                id="month-picker"
+                type="month"
+                aria-label="Selecionar mês" /></label
+            ><button
+              class="icon-button"
+              id="next-month"
+              aria-label="Próximo mês"
+            >
+              <span data-icon="chevron-right"></span>
+            </button>
+          </div>
+          <div class="toolbar-actions">
+            <span class="period-hint">Seu resumo mensal</span>
+            <details class="export-menu">
+              <summary class="button secondary">
+                <span data-icon="download"></span>Exportar<span
+                  data-icon="chevron-down"
+                ></span>
+              </summary>
+              <div class="export-options">
+                <button id="export-csv">Lançamentos filtrados (.csv)</button
+                ><button id="export-json">Backup completo (.json)</button
+                ><button id="import-json">Restaurar backup (.json)</button>
+              </div>
+            </details>
+            <input
+              type="file"
+              id="import-file"
+              accept=".json,application/json"
+              hidden
+            />
+          </div>
+        </section>
+        <div class="demo-banner" id="demo-banner">
+          <div>
+            <span data-icon="sparkles"></span
+            ><span
+              >Explore à vontade.
+              <strong>Você está vendo dados de exemplo.</strong></span
+            >
+          </div>
+          <button id="clear-demo">
+            Começar do zero <span aria-hidden="true">↗</span>
+          </button>
+        </div>
+        <section
+          class="summary-grid"
+          id="summary-grid"
+          aria-label="Resumo do mês"
+        ></section>
+        <section class="analytics-grid" id="analytics">
+          <article class="panel evolution-panel">
+            <div class="panel-header">
+              <div>
+                <h2>Evolução financeira</h2>
+                <p>Um panorama dos últimos 6 meses</p>
+              </div>
+              <span class="chart-period"
+                >Mensal <span data-icon="chevron-down"></span
+              ></span>
+            </div>
+            <div class="chart-legend">
+              <span><i class="legend-dot green"></i>Receitas</span
+              ><span><i class="legend-dot amber"></i>Despesas</span>
+            </div>
+            <div id="evolution-chart" class="evolution-chart"></div>
+          </article>
+          <article class="panel categories-panel">
+            <div class="panel-header">
+              <div>
+                <h2>Despesas por categoria</h2>
+                <p>Para onde seu dinheiro está indo</p>
+              </div>
+              <span data-icon="pie" class="muted-icon"></span>
+            </div>
+            <div id="category-chart"></div>
+          </article>
+        </section>
+        <section class="panel transactions-panel" id="transactions-panel">
+          <div class="panel-header">
+            <div>
+              <h2 id="table-title">Últimos lançamentos</h2>
+              <p id="table-subtitle">
+                Cada movimento conta para o seu equilíbrio.
+              </p>
+            </div>
+            <button class="text-button" id="see-all">
+              Ver todos <span data-icon="arrow-right"></span>
+            </button>
+          </div>
+          <div class="filters">
+            <label class="search-field"
+              ><span data-icon="search"></span
+              ><input
+                id="search"
+                type="search"
+                placeholder="Buscar lançamento..."
+                aria-label="Buscar lançamento"
+            /></label>
+            <div class="filter-selects">
+              <select id="type-filter" aria-label="Filtrar por tipo">
+                <option value="all">Todos os tipos</option>
+                <option value="income">Receitas</option>
+                <option value="expense">Despesas</option></select
+              ><select id="category-filter" aria-label="Filtrar por categoria">
+                <option value="all">Todas as categorias</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Descrição</th>
+                  <th>Categoria</th>
+                  <th>Data</th>
+                  <th>Tipo</th>
+                  <th class="amount-cell">Valor</th>
+                  <th><span class="sr-only">Ações</span></th>
+                </tr>
+              </thead>
+              <tbody id="transactions-body"></tbody>
+            </table>
+          </div>
+          <div id="empty-state" class="empty-state" hidden>
+            <span data-icon="search"></span>
+            <h3>Nenhum lançamento encontrado</h3>
+            <p id="empty-message">Adicione um lançamento para começar.</p>
+          </div>
+          <div class="table-footer">
+            <span id="table-count"></span
+            ><span>Organização hoje. Tranquilidade amanhã.</span>
+          </div>
+        </section>
+        <section class="panel help-panel" id="help-panel" hidden>
+          <h2>Seu controle financeiro, passo a passo</h2>
+          <ol>
+            <li>
+              <strong>Comece com seus dados.</strong> Use “Começar do zero” para
+              remover os exemplos.
+            </li>
+            <li>
+              <strong>Registre seus movimentos.</strong> Clique em “Novo
+              lançamento”, escolha receita ou despesa e preencha descrição,
+              valor, categoria e data.
+            </li>
+            <li>
+              <strong>Acompanhe cada mês.</strong> Use as setas ou o seletor de
+              mês. O saldo é a diferença entre receitas e despesas do mês, sem
+              saldo anterior.
+            </li>
+            <li>
+              <strong>Ajuste quando precisar.</strong> Na tabela, use os botões
+              de editar e excluir. Os filtros ajudam a encontrar um lançamento.
+            </li>
+            <li>
+              <strong>Guarde uma cópia.</strong> Em “Exportar”, baixe um backup
+              JSON. Você pode restaurá-lo neste ou em outro navegador. CSV é
+              ideal para planilhas.
+            </li>
+          </ol>
+          <div class="help-note">
+            <span data-icon="lock"></span>
+            <p>
+              Os lançamentos são salvos apenas neste navegador. Limpar os dados
+              do navegador remove seus registros. Não há sincronização bancária
+              ou entre dispositivos. Faça backups regularmente.
+            </p>
+          </div>
+          <p>
+            Quer construir ou personalizar o sistema?
+            <a href="README.md" download>Baixar o guia de instalação</a>.
+          </p>
+        </section>
+        <footer class="page-footer">
+          <span class="footer-brand">clareza.</span
+          ><span>Mais organização. Mais liberdade.</span
+          ><span
+            >Feito para o seu dia a dia <span aria-hidden="true">✳</span></span
+          >
+        </footer>
+      </main>
+    </div>
+    <dialog id="transaction-dialog" aria-labelledby="dialog-title">
+      <form id="transaction-form">
+        <div class="dialog-header">
+          <div>
+            <p class="eyebrow">ORGANIZE SEU DIA A DIA</p>
+            <h2 id="dialog-title">Novo lançamento</h2>
+          </div>
+          <button
+            type="button"
+            class="icon-button close-dialog"
+            aria-label="Fechar"
+          >
+            <span data-icon="x"></span>
+          </button>
+        </div>
+        <fieldset class="type-toggle">
+          <legend class="sr-only">Tipo de lançamento</legend>
+          <label
+            ><input type="radio" name="type" value="expense" checked /><span
+              >↗ Despesa</span
+            ></label
+          ><label
+            ><input type="radio" name="type" value="income" /><span
+              >↙ Receita</span
+            ></label
+          >
+        </fieldset>
+        <label class="form-field"
+          >Descrição<input
+            name="description"
+            maxlength="100"
+            placeholder="Ex.: Compras do mês"
+            required
+        /></label>
+        <div class="form-row">
+          <label class="form-field"
+            >Valor (R$)<input
+              name="amount"
+              inputmode="decimal"
+              placeholder="0,00"
+              required
+              autocomplete="off" /></label
+          ><label class="form-field"
+            >Data<input
+              name="date"
+              type="date"
+              required
+              min="1900-01-01"
+              max="9999-12-31"
+          /></label>
+        </div>
+        <label class="form-field"
+          >Categoria<select name="category" required></select
+        ></label>
+        <p id="form-error" class="form-error" role="alert"></p>
+        <div class="dialog-footer">
+          <button type="button" class="button secondary close-dialog">
+            Cancelar</button
+          ><button type="submit" class="button primary">
+            Salvar lançamento
+          </button>
+        </div>
+      </form>
+    </dialog>
+    <dialog
+      id="confirm-dialog"
+      aria-labelledby="confirm-title"
+      aria-describedby="confirm-message"
+    >
+      <form method="dialog">
+        <div class="confirm-icon" data-icon="help"></div>
+        <h2 id="confirm-title"></h2>
+        <p id="confirm-message"></p>
+        <div class="dialog-footer">
+          <button class="button secondary" value="cancel" autofocus>
+            Cancelar</button
+          ><button class="button danger" value="confirm" id="confirm-action">
+            Confirmar
+          </button>
+        </div>
+      </form>
+    </dialog>
+    <div id="toast" class="toast" role="status" hidden></div>
+  </body>
+</html>
